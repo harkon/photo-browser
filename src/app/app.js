@@ -1,37 +1,34 @@
 var options = {
+	target: '.wrapper',
 	partials: {
 		header: {
-			selector: 'header',
-			transclude: true,
+			selector: '#header',
 			events: {
-				search: 'form[name="searchFrm"]'
+				search: '#search'
 			}
 		},
 		stage: {
-			selector: 'iframe',
-			transclude: true,
+			selector: '#stage',
 			events: {
 				prevImg: '.prev',
 				nextImg: '.next'
 			}
 		},
 		social: {
-			selector: '#social-cont',
-			transclude: true,
+			selector: '#social',
 			events: {
 				share: 'button[type="button"]',
 			}
 		},
 		thumbnails: {
-			selector: '#thumbs-cont',
-			transclude: false,
+			selector: '#thumbnails',
+			templateId: 'thumb-tmpl', // this must be an id attribute on a template element
 			events: {
 				// show: 'a'
 			}
 		},
 		pagination: {
-			selector: '#pagination-cont',
-			transclude: true,
+			selector: '#pagination',
 			events: {
 				firstPage: '.first-page',
 				prevPage: '.prev-page',
@@ -41,9 +38,8 @@ var options = {
 		}
 	},
 	config: {
-			perPage: 5,
-			total: 200,
-		dataSource: '#thumbs-cont',
+		perPage: 6,
+		dataSource: '#thumbnails',
 		text: ''
 	}
 };

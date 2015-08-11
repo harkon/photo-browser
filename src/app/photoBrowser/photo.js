@@ -2,20 +2,14 @@
 
 	'use strict';
 
-	var Photo = function(data) {
+	PhotoBrowser.Photo = function(data) {
 
 		if (!data) {
 			throw new PhotoBrowser.errorHandler("Photo Init", "Data are required");
 		}
-		//BUG
-
-		// if (!data.index) {
-		// 	throw new PhotoBrowser.errorHandler("Photo Init", "Index is required for photo");
-		// }
 
 		// base property for all
 		this.index = data.index;
-		this.source = data.source;
 
 		// // properties for data from flickr API
 		this._id = data.id;
@@ -32,77 +26,66 @@
 		this.credits = data.credits || null;
 		this.text = data.text || null;
 
-
-
 		// we assume that both imageUrl and thumbUrl will be set if data source is the DOM
-		// so we set the urls to the APIs url without the '_' sign and the file extension 
+		// so we set the urls to the API url
+		// TODO: Handle image size dynamicaly
 		if (!this.thumbUrl || !this.imageUrl) {
-			this.thumbUrl = this.getHostname() + '/' + this.getFilename();
-			this.imageUrl = this.getHostname() + '/' + this.getFilename();
+			this.thumbUrl = this.getHostname() + '/' + this.getFilename('q');
+			this.imageUrl = this.getHostname() + '/' + this.getFilename('c');
 		}
 
 		return this;
 	};
 
-	Photo.prototype = Object.create(PhotoBrowser.prototype);
+	PhotoBrowser.Photo.prototype = Object.create(PhotoBrowser.prototype);
 
-	Photo.prototype.cache = {};
+	PhotoBrowser.Photo.prototype.cache = {};
 
-	Photo.prototype.load = function(size, callback) {
+	PhotoBrowser.Photo.prototype.load = function(type, callback) {
 
-		if (!size) {
-			throw new PhotoBrowser.errorHandler("Load photo", "You must specify an image size");
+		// TODO:check cache before try loading, preload
+
+		if (!type) {
+			throw new PhotoBrowser.errorHandler("Load photo", "You must specify an image type");
 		}
-		// NOTE:check cache before you try loading 
-		console.log(this)
 
+		var image = new Image(),
+			src = (type === 'thumb') ? this.thumbUrl : this.imageUrl,
+			self = this;
 
-		var self = this;
+		// shorten the arguments
+		if (typeof type === 'function') {
+			callback = type;
+			type = null;
+		}
 
-		//shorten arguments
-		// if (typeof size == 'function') {
-		// 	callback = size;
-		// 	size = null; // must fallback to a default
-		// }
+		// set some event handlers
+		image.onerror = function() {
+			this.onerror = this.onload = null;
+			callback.call(self, this);
+		};
 
+		image.onload = function() {
+			this.onerror = this.onload = null;
+			this.setAttribute('data-index', self.index);
+			callback.call(self, null, this);
+		};
 
-		// this.image = new Image();
+		// start loading
+		image.src = src;
 
-		// this.image.addEventListener('load', function() {
-
-		// 	self.cache[src] = src; // will override old cache
-		// 	callback.call(self, self);
-
-		// });
-
-		// // start loading
-		// this.image.src = src;
+		return this;
 	};
 
-	Photo.prototype.show = function(e) {
-
-		e.preventDefault();
-		e.stopPropagation();
-
-		this.load(function() {
-			this._browser.show(this.index);
-		});
-	};
-
-	Photo.prototype.clear = function() {
-		this.image = null;
-		this.thumb = null;
-	};
-
-	Photo.prototype.getHostname = function() {
+	PhotoBrowser.Photo.prototype.getHostname = function() {
 		return "http://farm" + this._farm + ".static.flickr.com";
 	};
 
-	Photo.getFilename = function(size) {
+	PhotoBrowser.Photo.getFilename = function(size) {
 		return this._server + "/" + this._id + "_" + this._secret + '_' + size + '.jpg';
 	};
 
 	// expose to global
-	global.Photo = Photo;
+	global.Photo = PhotoBrowser.Photo;
 
 })(window);
