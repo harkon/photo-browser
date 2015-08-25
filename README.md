@@ -29,3 +29,7 @@ For the implementation of this widget I have focused on the performance and I ha
 ## NOTE
 
 Styling is not done
+
+## Live demo 
+
+You can see a live demo [here](fretful-scent.surge.sh)
