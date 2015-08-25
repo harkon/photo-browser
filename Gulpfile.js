@@ -1,5 +1,4 @@
 var gulp = require('gulp');
-var clean = require('gulp-clean');
 var concat = require('gulp-concat');
 var util = require('gulp-util');
 var less = require('gulp-less');
@@ -10,10 +9,11 @@ var stylish = require('jshint-stylish');
 var browserSync = require('browser-sync').create();
 var reload = browserSync.reload;
 var path = require('path');
+var gulpCopy = require('gulp-copy');
+var del = require('del');
 
 gulp.task('clean', function() {
-   return gulp.src('dist')
-      .pipe(clean());
+   del.sync(['dist/**', '!dist']); 
 });
 
 gulp.task('less', function() {
@@ -41,14 +41,14 @@ gulp.task('html', function() {
       .pipe(gulp.dest('dist/'))
 });
 
-// gulp.task('watch', function() {
-//    gulp.watch('src/app/app.less', ['less']);
-//    gulp.watch('dist/css/app.css').on('change', reload);
-//    gulp.watch('src/app/**/*.js', ['js']).on('change', reload);
-//    gulp.watch('src/**/*.html').on('change', reload);
-// });
+gulp.task('copy', function() {
+   return gulp.src('assets/images/*.jpg', {
+         base: 'assets/images/'
+      })
+      .pipe(gulp.dest('dist/images'));
+});
 
-gulp.task('serve', ['less', 'js'], function() {
+gulp.task('serve', ['html', 'less', 'js'], function() {
    var files = [
       'src/**/*.html',
       'src/app/**/*.js',
@@ -69,4 +69,4 @@ gulp.task('serve', ['less', 'js'], function() {
 
 });
 
-gulp.task('default', ['clean', 'less', 'js']);
+gulp.task('default', ['clean', 'html', 'less', 'js', 'copy']);
