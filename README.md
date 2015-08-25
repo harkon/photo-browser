@@ -32,4 +32,4 @@ Styling is not done
 
 ## Live demo 
 
-You can see a live demo [here](fretful-scent.surge.sh)
+You can see a live demo [here](http://fretful-scent.surge.sh)
